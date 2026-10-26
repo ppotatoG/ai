@@ -13,14 +13,14 @@ const shape: Record<string, string> = {
   c: `M${W} ${H / 2 + T * 0.2} L${W - T} ${H / 2 + T * 0.7} V${H - T * 1.6} L${W} ${H - T} Z`,
 }
 
-export function SevenSeg({ text, height = 100, color, ghost = 0.09, glow = true }: { text: string; height?: number; color: string; ghost?: number; glow?: boolean }) {
+export function SevenSeg({ text, height = 100, color, ghost = 0.09, glow = true, skew = -6 }: { text: string; height?: number; color: string; ghost?: number; glow?: boolean; skew?: number }) {
   const chars = [...text]
   const gap = 16
   const width = chars.reduce((s, ch) => s + (ch === '.' || ch === ':' ? 18 : W + gap), 0)
   let x = 0
   return (
-    <svg width={(width * height) / H} height={height} viewBox={`-4 -4 ${width + 8} ${H + 8}`} style={{ overflow: 'visible', filter: glow ? `drop-shadow(0 0 ${height / 10}px ${color})` : undefined }}>
-      <g transform="skewX(-6)">
+    <svg width={(width * height) / H} height={height} viewBox={`-4 -4 ${width + 8} ${H + 8}`} style={{ overflow: 'visible', filter: glow ? `drop-shadow(0 0 ${Math.max(2, height / 12)}px ${color}) blur(${height > 60 ? 0 : 0.4}px)` : undefined }}>
+      <g transform={`skewX(${skew})`}>
         {chars.map((ch, i) => {
           const x0 = x
           if (ch === '.' || ch === ':') {

@@ -1,6 +1,7 @@
 import { AbsoluteFill, Img, interpolate, OffthreadVideo, staticFile, useCurrentFrame } from 'remotion'
 import { KoreaMap, along } from './KoreaMap'
-import { C, SAFE, cityOf, fonts, mdDate, shortPlace, stampDate, stampTime, weekday } from './theme'
+import { SevenSeg } from './SevenSeg'
+import { C, SAFE, cityOf, fonts, mdDate, shortPlace, stampTime, weekday } from './theme'
 import type { Clip, TripData } from './data'
 import { dayKm, kmScale, totalKm, type Leg, type Moment } from './edl'
 
@@ -22,11 +23,13 @@ export function Grain() {
   )
 }
 
-/** 디카 날짜 스탬프 — 화면에 상시 남는 유일한 정보 */
+/** 필름카메라식 시각 각인 (촬영 시각 + 재생된 만큼 초가 흐름) */
 function Stamp({ t }: { t: number }) {
+  const d = new Date(t)
+  const p = (n: number) => String(n).padStart(2, '0')
   return (
-    <div style={{ position: 'absolute', right: SAFE.right, bottom: SAFE.bottom, fontFamily: fonts.mono, fontSize: 34, color: C.stamp, opacity: 0.92, letterSpacing: 2, textShadow: `0 0 6px ${C.stamp}aa` }}>
-      {stampDate(t)}
+    <div style={{ position: 'absolute', right: SAFE.right, bottom: SAFE.bottom, opacity: 0.9 }}>
+      <SevenSeg text={`${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`} height={38} color={C.stamp} ghost={0} />
     </div>
   )
 }
@@ -54,7 +57,7 @@ export function Shot({ clip, startFrom, moment, frames, momentStart }: { clip: C
           <div style={{ ...label, fontSize: 40, marginTop: 6 }}>{shortPlace(moment.place)}</div>
         </div>
       )}
-      <Stamp t={clip.date} />
+      <Stamp t={clip.date + ((startFrom + f) / 30) * 1000} />
       <Grain />
     </AbsoluteFill>
   )
