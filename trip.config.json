@@ -3,10 +3,35 @@
   "title": "길 위의 3박 4일",
   "odometer": 2000,
   "exclude": [
-    "IMG_4828.MOV"
+    "IMG_2169.MOV",
+    "IMG_2205.MOV",
+    "IMG_2208.MOV",
+    "IMG_2210.MOV",
+    "IMG_2226.MOV",
+    "IMG_2235.MOV",
+    "IMG_2249.MOV",
+    "IMG_2253.MOV",
+    "IMG_2254.MOV",
+    "IMG_2309.MOV",
+    "IMG_2323.MOV",
+    "IMG_2330.MOV",
+    "IMG_2332.MOV",
+    "IMG_2345.MOV",
+    "IMG_2373.MOV",
+    "IMG_2383.MOV",
+    "IMG_2391.MOV",
+    "IMG_4779.MOV",
+    "IMG_4810.MOV",
+    "IMG_4827.MOV",
+    "IMG_4828.MOV",
+    "IMG_4846.MOV",
+    "IMG_4849.MOV"
   ],
   "dayTitles": {},
   "includePhotos": false,
   "minClipSeconds": 1.0,
-  "covers": {}
+  "covers": {},
+  "render": [
+    "EP01"
+  ]
 }

@@ -81,7 +81,9 @@ export function episode(trip: TripData, day: number, target = 55): Seg[] {
   const nightAt = !last && camp && isNight(camp.start) ? camp : undefined
 
   const fixed = 2.2 + 2.0 + drives.length * 1.8 + (last ? 0 : 1.8)
-  const cands: Cand[] = moments.flatMap((m) => m.items.map((id) => clips.get(id)!).map((clip) => ({ clip, moment: m, len: baseLen(clip), max: maxLen(clip) })))
+  // 오프닝에 깐 영상은 본편에서 다시 쓰지 않음
+  const cover = coverClip(trip, day)
+  const cands: Cand[] = moments.flatMap((m) => m.items.filter((id) => id !== cover?.id).map((id) => clips.get(id)!).map((clip) => ({ clip, moment: m, len: baseLen(clip), max: maxLen(clip) })))
   const chosen = pick(cands, target - fixed)
 
   const segs: Seg[] = [{ type: 'intro', frames: sec(2.2) }]
