@@ -2,6 +2,11 @@
   "source": "~/Desktop/무제 폴더",
   "title": "길 위의 3박 4일",
   "odometer": 2000,
-  "exclude": [],
-  "dayTitles": {}
+  "exclude": [
+    "IMG_4828.MOV"
+  ],
+  "dayTitles": {},
+  "includePhotos": false,
+  "minClipSeconds": 1.0,
+  "covers": {}
 }

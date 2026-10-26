@@ -106,8 +106,11 @@ async function main() {
   for (const f of files) {
     const path = join(SRC, f)
     const isVideo = /\.(mov|mp4|m4v)$/i.test(f)
+    if (!isVideo && config.includePhotos === false) continue
     const meta = isVideo ? await probeVideo(path) : await probePhoto(path)
     if (!meta || isNaN(meta.date)) { console.log(`  건너뜀 ${f}`); continue }
+    const len = 'duration' in meta ? Number(meta.duration) : Infinity
+    if (isVideo && len < (config.minClipSeconds ?? 1)) { console.log(`  너무 짧음 ${f} (${len.toFixed(2)}s)`); continue }
     // "IMG_1 (1).MOV" 같은 사본: 같은 시각·같은 종류면 하나만
     const dupKey = `${isVideo}-${Math.round(meta.date / 1000)}`
     if (seen.has(dupKey)) { console.log(`  중복 ${f} = ${seen.get(dupKey)}`); continue }
@@ -154,6 +157,7 @@ async function main() {
     title: config.title,
     odometer: config.odometer,
     dayTitles: config.dayTitles,
+    covers: Object.fromEntries(Object.entries((config.covers ?? {}) as Record<string, string>).map(([k, v]) => [k, basename(v, extname(v)).replace(/\W+/g, '_')])),
     items: [...byId.values()].map(({ id, kind, file, date, lat, lng, duration, w, h, geoGuess }) => ({ id, kind, file, date, lat, lng, duration, w, h, geoGuess })),
     days: days.map((d) => ({ index: d.index, key: d.key, date: +d.date, items: d.items.map((i) => i.id) })),
     moments: moments.map((m) => ({ id: m.id, day: m.day, items: m.items.map((i) => i.id), start: m.start, end: m.end, place: m.place, first: m.first, last: m.last, weather: wx[m.id] })),

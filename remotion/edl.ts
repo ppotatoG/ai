@@ -22,7 +22,7 @@ export function kmScale(trip: TripData) {
   const routed = trip.legs.reduce((s, l) => s + l.km, 0)
   if (!trip.odometer || !routed) return 1
   const r = trip.odometer / routed
-  return r > 0.8 && r < 1.6 ? r : 1
+  return r > 0.8 && r < 2.2 ? r : 1
 }
 export const dayKm = (trip: TripData, day: number) => trip.legs.filter((l) => l.day === day).reduce((s, l) => s + l.km, 0) * kmScale(trip)
 export const totalKm = (trip: TripData) => (kmScale(trip) !== 1 && trip.odometer ? trip.odometer : trip.legs.reduce((s, l) => s + l.km, 0))
@@ -128,3 +128,14 @@ export function summary(trip: TripData, perDay = 9): Seg[] {
 }
 
 export const totalFrames = (segs: Seg[]) => segs.reduce((s, x) => s + x.frames, 0)
+
+/** 오프닝 영상: config의 covers 지정 → 없으면 그날 3초 이상인 첫 영상 */
+export function coverClip(trip: TripData, day?: number) {
+  const key = day === undefined ? 'summary' : String(day)
+  const byId = new Map(trip.items.map((c) => [c.id, c]))
+  const chosen = trip.covers?.[key] && byId.get(trip.covers[key])
+  if (chosen) return chosen
+  const ids = day === undefined ? trip.items.map((c) => c.id) : trip.days[day].items
+  const vids = ids.map((id) => byId.get(id)!).filter((c) => c.kind === 'video')
+  return vids.find((c) => (c.duration ?? 0) >= 3) ?? vids[0]
+}

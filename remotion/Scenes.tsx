@@ -78,9 +78,9 @@ export function Intro({ trip, day, cover }: { trip: TripData; day?: number; cove
   return (
     <AbsoluteFill style={{ background: '#000' }}>
       {cover && (
-        <AbsoluteFill style={{ opacity: 0.55 }}>
+        <AbsoluteFill style={{ opacity: 0.55 * fadeIn(f, 0, 10) }}>
           {cover.kind === 'video'
-            ? <OffthreadVideo src={staticFile(cover.file)} muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ? <OffthreadVideo src={staticFile(cover.file)} muted startFrom={Math.max(0, Math.round(((cover.duration ?? 0) - 2.4) / 2 * 30))} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             : <Img src={staticFile(cover.file)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
         </AbsoluteFill>
       )}

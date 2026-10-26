@@ -3,13 +3,12 @@ import { AbsoluteFill, Series } from 'remotion'
 import { DayCard, Drive, Intro, Night, Outro, Shot } from './Scenes'
 import { cityOf } from './theme'
 import type { TripData } from './data'
-import type { Seg } from './edl'
+import { coverClip, type Seg } from './edl'
 
 /** EDL(컷 목록)을 그대로 이어 붙이는 세로 숏폼 */
 export function Short({ trip, segs, day }: { trip: TripData; segs: Seg[]; day?: number }) {
   const byId = new Map(trip.moments.map((m) => [m.id, m]))
-  const firstShot = segs.find((s) => s.type === 'shot' && s.clip.kind === 'video')
-  const cover = firstShot?.type === 'shot' ? firstShot.clip : undefined
+  const cover = coverClip(trip, day)
   return (
     <AbsoluteFill style={{ background: '#000' }}>
       <Series>
