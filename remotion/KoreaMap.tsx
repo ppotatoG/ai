@@ -15,10 +15,13 @@ interface Props {
   van?: LL
   lit?: string[]
   labels?: boolean
+  /** 얇은 흰 경계선만 */
+  minimal?: boolean
+  dot?: LL
 }
 
 /** 시·도 경계를 직접 그린 지도. 타일 없이 렌더링되어 영상 렌더에 안전 */
-export function KoreaMap({ width, height, fit, pad = 0.18, lines, van, lit = [], labels }: Props) {
+export function KoreaMap({ width, height, fit, pad = 0.18, lines, van, lit = [], labels, minimal, dot }: Props) {
   const proj = useMemo(() => {
     const lats = fit.map((p) => p[0]), lngs = fit.map((p) => p[1])
     let [la0, la1, ln0, ln1] = [Math.min(...lats), Math.max(...lats), Math.min(...lngs), Math.max(...lngs)]
@@ -53,17 +56,20 @@ export function KoreaMap({ width, height, fit, pad = 0.18, lines, van, lit = [],
   return (
     <svg width={width} height={height} style={{ position: 'absolute', inset: 0 }}>
       {provinces.map((p) => (
-        <path key={p.name} d={p.d} fill={lit.includes(shortName(p.name)) ? 'rgba(159,211,255,0.13)' : 'rgba(255,255,255,0.035)'} stroke="rgba(159,211,255,0.35)" strokeWidth={1.4} />
+        minimal
+          ? <path key={p.name} d={p.d} fill="none" stroke="rgba(255,255,255,0.16)" strokeWidth={1.2} />
+          : <path key={p.name} d={p.d} fill={lit.includes(shortName(p.name)) ? 'rgba(159,211,255,0.13)' : 'rgba(255,255,255,0.035)'} stroke="rgba(159,211,255,0.35)" strokeWidth={1.4} />
       ))}
       {labels && provinces.filter((p) => lit.includes(shortName(p.name))).map((p) => (
         <text key={p.name} x={p.c[0]} y={p.c[1]} fill="rgba(159,211,255,0.6)" fontSize={26} textAnchor="middle" fontFamily="sans-serif" letterSpacing={4}>{shortName(p.name)}</text>
       ))}
       {lines.map((l, i) => (
         <g key={i} opacity={l.dim ? 0.35 : 1}>
-          <path d={path(l.coords, l.progress)} fill="none" stroke={l.color} strokeWidth={(l.width ?? 7) * 3} strokeLinecap="round" strokeLinejoin="round" opacity={0.18} />
+          {!minimal && <path d={path(l.coords, l.progress)} fill="none" stroke={l.color} strokeWidth={(l.width ?? 7) * 3} strokeLinecap="round" strokeLinejoin="round" opacity={0.18} />}
           <path d={path(l.coords, l.progress)} fill="none" stroke={l.color} strokeWidth={l.width ?? 7} strokeLinecap="round" strokeLinejoin="round" />
         </g>
       ))}
+      {dot && (() => { const [x, y] = proj(dot); return <circle cx={x} cy={y} r={9} fill="#fff" /> })()}
       {van && (() => {
         const [x, y] = proj(van)
         return (

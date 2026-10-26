@@ -29,8 +29,8 @@ export const totalKm = (trip: TripData) => (kmScale(trip) !== 1 && trip.odometer
 
 interface Cand { clip: Clip; moment: Moment; len: number; max: number }
 
-const baseLen = (c: Clip) => (c.kind === 'video' ? Math.min(Math.max((c.duration ?? 2) - 0.3, 0.7), 2.0) : 1.0)
-const maxLen = (c: Clip) => (c.kind === 'video' ? Math.min((c.duration ?? 2) - 0.2, 3.5) : 1.6)
+const baseLen = (c: Clip) => (c.kind === 'video' ? Math.min(Math.max((c.duration ?? 2) - 0.3, 0.6), 1.2) : 0.7)
+const maxLen = (c: Clip) => (c.kind === 'video' ? Math.min((c.duration ?? 2) - 0.2, 1.8) : 0.9)
 
 /** 예산(초)에 맞게 컷 고르기: 장면마다 최소 1컷, 많은 장면부터 덜어냄 */
 function pick(cands: Cand[], budget: number): Cand[] {
@@ -80,24 +80,24 @@ export function episode(trip: TripData, day: number, target = 55): Seg[] {
   const camp = [...moments].reverse().find((m) => m.first)
   const nightAt = !last && camp && isNight(camp.start) ? camp : undefined
 
-  const fixed = 2.5 + 2.5 + drives.length * 2.4 + (last ? 0 : 2.2)
+  const fixed = 2.2 + 2.0 + drives.length * 1.8 + (last ? 0 : 1.8)
   const cands: Cand[] = moments.flatMap((m) => m.items.map((id) => clips.get(id)!).map((clip) => ({ clip, moment: m, len: baseLen(clip), max: maxLen(clip) })))
   const chosen = pick(cands, target - fixed)
 
-  const segs: Seg[] = [{ type: 'intro', frames: sec(2.5) }]
+  const segs: Seg[] = [{ type: 'intro', frames: sec(2.2) }]
   let nightDone = false
   for (const m of moments) {
     const leg = drives.find((l) => l.to === m.id)
-    if (leg) segs.push({ type: 'drive', frames: sec(2.4), leg, odo: odoAt(trip, m.start, base, day) })
-    if (m === nightAt) { segs.push({ type: 'night', frames: sec(2.2), moment: m }); nightDone = true }
+    if (leg) segs.push({ type: 'drive', frames: sec(1.8), leg, odo: odoAt(trip, m.start, base, day) })
+    if (m === nightAt) { segs.push({ type: 'night', frames: sec(1.8), moment: m }); nightDone = true }
     for (const c of chosen.filter((x) => x.moment === m)) {
       const dur = c.clip.duration ?? 0
       const startFrom = c.clip.kind === 'video' ? Math.max(0, Math.min(0.15, dur - c.len)) + Math.max(0, (dur - c.len - 0.15) / 2) : 0
-      segs.push({ type: 'shot', frames: Math.max(sec(c.len), 15), clip: c.clip, startFrom: sec(startFrom), moment: m, odo: odoAt(trip, c.clip.date, base, day) })
+      segs.push({ type: 'shot', frames: Math.max(sec(c.len), 12), clip: c.clip, startFrom: sec(startFrom), moment: m, odo: odoAt(trip, c.clip.date, base, day) })
     }
   }
-  if (!last && !nightDone) segs.push({ type: 'night', frames: sec(2.2), moment: camp })
-  segs.push({ type: 'outro', frames: sec(2.5) })
+  if (!last && !nightDone) segs.push({ type: 'night', frames: sec(1.8), moment: camp })
+  segs.push({ type: 'outro', frames: sec(2.0) })
   return segs
 }
 
